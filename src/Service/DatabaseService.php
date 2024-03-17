@@ -43,16 +43,41 @@ class DatabaseService
 
     public function addRowToTable(string $tableName, array $data): bool
     {
-        $columns = implode(',', array_keys($data));
-
         $values_prepared = [];
+
         array_walk($data, static function ($value) use (&$values_prepared) {
             $values_prepared[] = sprintf('"%s"', $value);
         });
+
         $values = implode(',', array_values($values_prepared));
+        $columns = implode(',', array_keys($data));
 
         return $this->connection
             ->prepare("INSERT INTO $tableName ($columns) VALUES ($values)")
+            ->execute();
+    }
+
+    public function findOneByID(string $tableName, int $id): false|array
+    {
+        return $this->connection
+            ->query("SELECT * FROM $tableName WHERE id = $id LIMIT 1")
+            ->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function updateOneByID(string $tableName, int $id, array $data): bool
+    {
+        $values_prepared = [];
+
+        foreach ($data as $column => $value) {
+            if (!is_null($value)) {
+                $values_prepared[] = sprintf('%s = "%s"', $column, $value);
+            }
+        }
+
+        $values = implode(',', $values_prepared);
+
+        return $this->connection
+            ->prepare("UPDATE $tableName SET $values WHERE id = $id")
             ->execute();
     }
 }

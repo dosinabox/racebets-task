@@ -28,32 +28,101 @@ class UserController extends AbstractController
                     'country' => $request->getPayload()->get('country'),
                     'money_real' => 0,
                     'money_bonus' => 0,
-                    'bonus' => rand(5, 20),
+                    'bonus' => random_int(5, 20)
                 ]
             );
         } catch (\Throwable $throwable) {
             return new JsonResponse(
                 [
-                    'code' => $throwable->getCode(),
-                    'message' => 'Error on adding user: ' . $throwable->getMessage(),
-                ]
+                    'message' => 'Error on adding user: ' . $throwable->getMessage()
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
 
         if ($user) {
             return new JsonResponse(
                 [
-                    'code' => Response::HTTP_CREATED,
-                    'message' => 'User added.',
+                    'message' => 'User added.'
+                ],
+                Response::HTTP_CREATED
+            );
+        }
+
+        return new JsonResponse(
+            [
+                'message' => 'User not added.'
+            ],
+            Response::HTTP_BAD_REQUEST
+        );
+    }
+
+    #[Route(path: '/users/edit/{id}', name: 'editUser', methods: 'POST')]
+    public function update(int $id, Request $request): Response
+    {
+        try {
+            //TODO make a single request
+            if (!$this->databaseService->findOneByID('users', $id)) {
+                return new JsonResponse(
+                    [
+                        'message' => 'User not found.'
+                    ],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            $this->databaseService->updateOneByID('users', $id,
+                [
+                    'email' => $request->getPayload()->get('email'),
+                    'firstName' => $request->getPayload()->get('firstName'),
+                    'lastName' => $request->getPayload()->get('lastName'),
+                    'gender' => $request->getPayload()->get('gender'),
+                    'country' => $request->getPayload()->get('country')
+                ]
+            );
+        } catch (\Throwable $throwable) {
+            return new JsonResponse(
+                [
+                    'message' => 'Error on updating user: ' . $throwable->getMessage()
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+
+        return new JsonResponse(
+            [
+                'message' => 'User updated.'
+            ]
+        );
+    }
+
+    #[Route(path: '/users/{id}', name: 'showUser', methods: 'GET')]
+    public function show(int $id): Response
+    {
+        try {
+            $user = $this->databaseService->findOneByID('users', $id);
+        } catch (\Throwable $throwable) {
+            return new JsonResponse(
+                [
+                    'message' => 'Error on finding user: ' . $throwable->getMessage()
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+
+        if ($user) {
+            return new JsonResponse(
+                [
+                    'user' => $user
                 ]
             );
         }
 
         return new JsonResponse(
             [
-                'code' => Response::HTTP_BAD_REQUEST,
-                'message' => 'User not added.',
-            ]
+                'message' => 'User not found.'
+            ],
+            Response::HTTP_NOT_FOUND
         );
     }
 }

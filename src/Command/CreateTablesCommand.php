@@ -46,7 +46,7 @@ class CreateTablesCommand extends Command
                 'country' => 'VARCHAR(50)',
                 'bonus' => 'INT',
                 'money_real' => 'DECIMAL',
-                'money_bonus' => 'DECIMAL',
+                'money_bonus' => 'DECIMAL'
             ]
         );
 
@@ -66,7 +66,7 @@ class CreateTablesCommand extends Command
                 'date' => 'DATETIME',
                 'type' => 'VARCHAR(50)',
                 'amount' => 'DECIMAL',
-                'user_id' => 'INT',
+                'user_id' => 'INT'
             ]
         );
 
