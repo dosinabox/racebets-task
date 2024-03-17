@@ -21,8 +21,8 @@ class CreateTablesCommand extends Command
         try {
             $output->writeln($this->createUsersTable());
             $output->writeln($this->createHistoryTable());
-        } catch (\Throwable $error) {
-            $output->writeln('Error on creating tables: ' . $error->getMessage());
+        } catch (\Throwable $throwable) {
+            $output->writeln('Error on creating tables: ' . $throwable->getMessage());
 
             return Command::FAILURE;
         }
@@ -39,7 +39,6 @@ class CreateTablesCommand extends Command
     {
         $table = $this->databaseService->createTable('users',
             [
-                'id' => 'INT',
                 'email' => 'VARCHAR(120)',
                 'firstName' => 'VARCHAR(120)',
                 'lastName' => 'VARCHAR(120)',
@@ -48,9 +47,10 @@ class CreateTablesCommand extends Command
                 'bonus' => 'INT',
                 'money_real' => 'DECIMAL',
                 'money_bonus' => 'DECIMAL',
-            ],
-            'id'
+            ]
         );
+
+        $this->databaseService->addUniqueConstraint('users', 'email');
 
         if ($table) {
             return 'Users table created.';
@@ -63,13 +63,11 @@ class CreateTablesCommand extends Command
     {
         $table = $this->databaseService->createTable('history',
             [
-                'id' => 'INT',
                 'date' => 'DATETIME',
                 'type' => 'VARCHAR(50)',
                 'amount' => 'DECIMAL',
                 'user_id' => 'INT',
-            ],
-            'id'
+            ]
         );
 
         if ($table) {

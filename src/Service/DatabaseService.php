@@ -21,20 +21,38 @@ class DatabaseService
         );
     }
 
-    public function createTable(string $tableName, array $columns, ?string $primaryKey = null): bool
+    public function createTable(string $tableName, array $columns): bool
     {
-        $fields = '';
+        $fields = 'id INT NOT NULL AUTO_INCREMENT';
 
         foreach ($columns as $column => $type) {
-            $fields .= $column . ' ' . $type . ',';
-        }
-
-        if ($primaryKey && array_key_exists($primaryKey, $columns)) {
-            $fields .= sprintf('PRIMARY KEY (%s)', $primaryKey);
+            $fields .= ',' . $column . ' ' . $type;
         }
 
         return $this->connection
-            ->prepare("CREATE TABLE $tableName ($fields)")
+            ->prepare("CREATE TABLE $tableName ($fields,PRIMARY KEY (id))")
+            ->execute();
+    }
+
+    public function addUniqueConstraint(string $tableName, string $column): bool
+    {
+        return $this->connection
+            ->prepare("ALTER TABLE $tableName ADD UNIQUE ($column)")
+            ->execute();
+    }
+
+    public function addRowToTable(string $tableName, array $data): bool
+    {
+        $columns = implode(',', array_keys($data));
+
+        $values_prepared = [];
+        array_walk($data, static function ($value) use (&$values_prepared) {
+            $values_prepared[] = sprintf('"%s"', $value);
+        });
+        $values = implode(',', array_values($values_prepared));
+
+        return $this->connection
+            ->prepare("INSERT INTO $tableName ($columns) VALUES ($values)")
             ->execute();
     }
 }
