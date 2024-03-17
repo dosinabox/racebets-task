@@ -21,20 +21,20 @@ class DatabaseService
         );
     }
 
-    public function createTable(string $tableName, array $columns): void
+    public function createTable(string $tableName, array $columns, ?string $primaryKey = null): bool
     {
         $fields = '';
 
         foreach ($columns as $column => $type) {
             $fields .= $column . ' ' . $type . ',';
         }
-        $fields = rtrim($fields, ',');
 
-        $this->connection->query(
-            sprintf('CREATE TABLE %s (%s)',
-                $tableName,
-                $fields
-            ),
-        );
+        if ($primaryKey && array_key_exists($primaryKey, $columns)) {
+            $fields .= sprintf('PRIMARY KEY (%s)', $primaryKey);
+        }
+
+        return $this->connection
+            ->prepare('CREATE TABLE IF NOT EXISTS %s (%s)')
+            ->execute([$tableName, $fields]);
     }
 }
