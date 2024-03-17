@@ -34,7 +34,7 @@ class DatabaseService
         }
 
         return $this->connection
-            ->prepare('CREATE TABLE IF NOT EXISTS %s (%s)')
-            ->execute([$tableName, $fields]);
+            ->prepare("CREATE TABLE $tableName ($fields)")
+            ->execute();
     }
 }
