@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Exception\NotFoundException;
 use PDO;
 
 class DatabaseService
@@ -68,13 +69,22 @@ class DatabaseService
 
     public function findOneByID(string $tableName, int $id): false|array
     {
-        return $this->connection
+        $object = $this->connection
             ->query("SELECT * FROM $tableName WHERE id = $id LIMIT 1")
             ->fetch(PDO::FETCH_ASSOC);
+
+        if (!$object) {
+            throw new NotFoundException($id, $tableName);
+        }
+
+        return $object;
     }
 
     public function updateOneByID(string $tableName, int $id, array $data): bool
     {
+        //try to find the object first for proper exceptions and responses
+        $this->findOneByID($tableName, $id);
+
         $values_prepared = [];
 
         foreach ($data as $column => $value) {

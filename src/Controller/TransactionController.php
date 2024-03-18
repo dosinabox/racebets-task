@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Exception\UnknownTransactionTypeException;
 use App\Service\TransactionService;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,35 +20,26 @@ class TransactionController extends AbstractController
     #[Route(path: '/transactions/{userID}', name: 'transaction', methods: 'POST')]
     public function create(int $userID, Request $request): Response
     {
-        switch ($request->getPayload()->get('type')) {
-            case TransactionService::TYPE_DEPOSIT:
-                $transaction = $this->transactionService->deposit($userID, $request->getPayload()->get('amount'));
-                break;
-            case TransactionService::TYPE_WITHDRAWAL:
-                $transaction = $this->transactionService->withdraw($userID, $request->getPayload()->get('amount'));
-                break;
-            default:
-                return new JsonResponse(
-                    [
-                        'message' => 'Unknown type of transaction.'
-                    ],
-                    Response::HTTP_BAD_REQUEST
-                );
-        }
-
-        if ($transaction) {
-            return new JsonResponse(
-                [
-                    'message' => 'Transaction successful.'
-                ]
-            );
+        try {
+            $transactionType = $request->getPayload()->get('type');
+            $transaction = match ($transactionType) {
+                TransactionService::TYPE_DEPOSIT => $this->transactionService
+                    ->deposit($userID, $request->getPayload()->get('amount')),
+                TransactionService::TYPE_WITHDRAWAL => $this->transactionService
+                    ->withdraw($userID, $request->getPayload()->get('amount')),
+                default => throw new UnknownTransactionTypeException($transactionType),
+            };
+        } catch (Exception $exception) {
+            $error = $exception->getMessage();
+            $code = $exception->getCode();
         }
 
         return new JsonResponse(
             [
-                'message' => 'Transaction failed.'
+                'success' => $transaction ?? false,
+                'error' => $error ?? null
             ],
-            Response::HTTP_INTERNAL_SERVER_ERROR
+            $code ?? Response::HTTP_OK
         );
     }
 }

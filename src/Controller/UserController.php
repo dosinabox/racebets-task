@@ -33,28 +33,16 @@ class UserController extends AbstractController
                 ]
             );
         } catch (Exception $exception) {
-            return new JsonResponse(
-                [
-                    'message' => 'Error on adding user: ' . $exception->getMessage()
-                ],
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-        }
-
-        if ($user) {
-            return new JsonResponse(
-                [
-                    'message' => 'User added.'
-                ],
-                Response::HTTP_CREATED
-            );
+            $error = $exception->getMessage();
+            $errorCode = $exception->getCode();
         }
 
         return new JsonResponse(
             [
-                'message' => 'User not added.'
+                'success' => $user ?? false,
+                'error' => $error ?? null
             ],
-            Response::HTTP_BAD_REQUEST
+            $errorCode ?? Response::HTTP_OK
         );
     }
 
@@ -62,17 +50,7 @@ class UserController extends AbstractController
     public function update(int $id, Request $request): Response
     {
         try {
-            //TODO make a single request
-            if (!$this->databaseService->findOneByID('users', $id)) {
-                return new JsonResponse(
-                    [
-                        'message' => 'User not found.'
-                    ],
-                    Response::HTTP_NOT_FOUND
-                );
-            }
-
-            $this->databaseService->updateOneByID('users', $id,
+            $user = $this->databaseService->updateOneByID('users', $id,
                 [
                     'email' => $request->getPayload()->get('email'),
                     'firstName' => $request->getPayload()->get('firstName'),
@@ -82,18 +60,16 @@ class UserController extends AbstractController
                 ]
             );
         } catch (Exception $exception) {
-            return new JsonResponse(
-                [
-                    'message' => 'Error on updating user: ' . $exception->getMessage()
-                ],
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
+            $error = $exception->getMessage();
+            $errorCode = $exception->getCode();
         }
 
         return new JsonResponse(
             [
-                'message' => 'User updated.'
-            ]
+                'success' => $user ?? false,
+                'error' => $error ?? null
+            ],
+            $errorCode ?? Response::HTTP_OK
         );
     }
 
@@ -103,27 +79,17 @@ class UserController extends AbstractController
         try {
             $user = $this->databaseService->findOneByID('users', $id);
         } catch (Exception $exception) {
-            return new JsonResponse(
-                [
-                    'message' => 'Error on finding user: ' . $exception->getMessage()
-                ],
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-        }
-
-        if ($user) {
-            return new JsonResponse(
-                [
-                    'user' => $user
-                ]
-            );
+            $error = $exception->getMessage();
+            $errorCode = $exception->getCode();
         }
 
         return new JsonResponse(
             [
-                'message' => 'User not found.'
+                'user' => $user ?? [],
+                'success' => (bool)($user ?? false),
+                'error' => $error ?? null
             ],
-            Response::HTTP_NOT_FOUND
+            $errorCode ?? Response::HTTP_OK
         );
     }
 }

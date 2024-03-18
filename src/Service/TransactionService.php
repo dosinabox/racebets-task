@@ -13,11 +13,19 @@ class TransactionService
     {
     }
 
+    /**
+     * @param int $userID
+     * @param float $amount
+     * @return bool
+     * @throws Exception
+     */
     public function deposit(int $userID, float $amount): bool
     {
         try {
             $this->databaseService->getConnection()->beginTransaction();
 
+            //double requests just to get the user's current money amount - not good!
+            //TODO make it better
             $user = $this->databaseService->findOneByID('users', $userID);
             $this->databaseService->updateOneByID('users', $userID,
                 [
@@ -35,18 +43,26 @@ class TransactionService
             $this->databaseService->getConnection()->commit();
 
             return true;
-        } catch (Exception) {
+        } catch (Exception $exception) {
             $this->databaseService->getConnection()->rollBack();
-        }
 
-        return false;
+            throw $exception;
+        }
     }
 
+    /**
+     * @param int $userID
+     * @param float $amount
+     * @return bool
+     * @throws Exception
+     */
     public function withdraw(int $userID, float $amount): bool
     {
         try {
             $this->databaseService->getConnection()->beginTransaction();
 
+            //double requests just to get the user's current money amount - not good!
+            //TODO make it better
             $user = $this->databaseService->findOneByID('users', $userID);
             $this->databaseService->updateOneByID('users', $userID,
                 [
@@ -64,10 +80,10 @@ class TransactionService
             $this->databaseService->getConnection()->commit();
 
             return true;
-        } catch (Exception) {
+        } catch (Exception $exception) {
             $this->databaseService->getConnection()->rollBack();
-        }
 
-        return false;
+            throw $exception;
+        }
     }
 }
