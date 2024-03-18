@@ -89,4 +89,9 @@ class DatabaseService
             ->prepare("UPDATE $tableName SET $values WHERE id = $id")
             ->execute();
     }
+
+    public function getConnection(): PDO
+    {
+        return $this->connection;
+    }
 }
