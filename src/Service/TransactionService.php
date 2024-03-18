@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Transaction;
+use App\Entity\User;
 use Exception;
 
 class TransactionService
@@ -26,17 +28,17 @@ class TransactionService
 
             //double requests just to get the user's current money amount - not good!
             //TODO make it better
-            $user = $this->databaseService->findOneByID('users', $userID);
-            $this->databaseService->updateOneByID('users', $userID,
+            $user = $this->databaseService->findOneByID(User::TABLE, $userID);
+            $this->databaseService->updateOneByID(User::TABLE, $userID,
                 [
-                    'money_real' => (float)$user['money_real'] + $amount
+                    User::COLUMN_MONEY_REAL => (float)$user[User::COLUMN_MONEY_REAL] + $amount
                 ]
             );
-            $this->databaseService->addRowToTable('transactions',
+            $this->databaseService->addRowToTable(Transaction::TABLE,
                 [
-                    'type' => self::TYPE_DEPOSIT,
-                    'amount' => $amount,
-                    'user_id' => $userID
+                    Transaction::COLUMN_TYPE => self::TYPE_DEPOSIT,
+                    Transaction::COLUMN_AMOUNT => $amount,
+                    Transaction::COLUMN_USER_ID => $userID
                 ]
             );
 
@@ -63,17 +65,17 @@ class TransactionService
 
             //double requests just to get the user's current money amount - not good!
             //TODO make it better
-            $user = $this->databaseService->findOneByID('users', $userID);
-            $this->databaseService->updateOneByID('users', $userID,
+            $user = $this->databaseService->findOneByID(User::TABLE, $userID);
+            $this->databaseService->updateOneByID(User::TABLE, $userID,
                 [
-                    'money_real' => (float)$user['money_real'] - $amount
+                    User::COLUMN_MONEY_REAL => (float)$user[User::COLUMN_MONEY_REAL] - $amount
                 ]
             );
-            $this->databaseService->addRowToTable('transactions',
+            $this->databaseService->addRowToTable(Transaction::TABLE,
                 [
-                    'type' => self::TYPE_WITHDRAWAL,
-                    'amount' => $amount,
-                    'user_id' => $userID
+                    Transaction::COLUMN_TYPE => self::TYPE_WITHDRAWAL,
+                    Transaction::COLUMN_AMOUNT => $amount,
+                    Transaction::COLUMN_USER_ID => $userID
                 ]
             );
 

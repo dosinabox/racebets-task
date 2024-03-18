@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Transaction;
 use App\Exception\UnknownTransactionTypeException;
 use App\Service\TransactionService;
 use Exception;
@@ -17,16 +18,16 @@ class TransactionController extends AbstractController
     {
     }
 
-    #[Route(path: '/transactions/{userID}', name: 'transaction', methods: 'POST')]
-    public function create(int $userID, Request $request): Response
+    #[Route(path: '/api/v1/transactions/{userID}', name: 'addTransaction', methods: 'POST')]
+    public function add(int $userID, Request $request): Response
     {
         try {
-            $transactionType = $request->getPayload()->get('type');
+            $transactionType = $request->getPayload()->get(Transaction::COLUMN_TYPE);
+            $amount = $request->getPayload()->get(Transaction::COLUMN_AMOUNT);
+
             $transaction = match ($transactionType) {
-                TransactionService::TYPE_DEPOSIT => $this->transactionService
-                    ->deposit($userID, $request->getPayload()->get('amount')),
-                TransactionService::TYPE_WITHDRAWAL => $this->transactionService
-                    ->withdraw($userID, $request->getPayload()->get('amount')),
+                TransactionService::TYPE_DEPOSIT => $this->transactionService->deposit($userID, $amount),
+                TransactionService::TYPE_WITHDRAWAL => $this->transactionService->withdraw($userID, $amount),
                 default => throw new UnknownTransactionTypeException($transactionType),
             };
         } catch (Exception $exception) {
@@ -39,7 +40,7 @@ class TransactionController extends AbstractController
                 'success' => $transaction ?? false,
                 'error' => $error ?? null
             ],
-            $code ?? Response::HTTP_OK
+            $code ?? Response::HTTP_CREATED
         );
     }
 }

@@ -11,10 +11,10 @@
 
 Use Postman to access the following endpoints:
 
-- `https://localhost/users/add` (POST): Send form-data to create a new user.
-- `https://localhost/users/edit/{id}` (POST): Send form-data to update an existing user.
-- `https://localhost/users/{id}` (GET): Get info about an existing user.
-- `https://localhost/transactions/{id}` (POST): Send form-data to create a transaction for the user with the given ID.
+- `https://localhost/api/v1/users/add` (POST): Send form-data to create a new user.
+- `https://localhost/api/v1/users/edit/{id}` (POST): Send form-data to update an existing user.
+- `https://localhost/api/v1/users/{id}` (GET): Get info about an existing user.
+- `https://localhost/api/v1/transactions/{id}` (POST): Send form-data to create a transaction for the user with the given ID.
 
 POST form-data example for users:
 ```

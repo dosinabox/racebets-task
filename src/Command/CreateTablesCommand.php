@@ -2,6 +2,8 @@
 
 namespace App\Command;
 
+use App\Entity\Transaction;
+use App\Entity\User;
 use App\Service\DatabaseService;
 use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -38,20 +40,20 @@ class CreateTablesCommand extends Command
 
     private function createUsersTable(): string
     {
-        $table = $this->databaseService->createTable('users',
+        $table = $this->databaseService->createTable(User::TABLE,
             [
-                'email' => 'VARCHAR(255)',
-                'firstName' => 'VARCHAR(255)',
-                'lastName' => 'VARCHAR(255)',
-                'gender' => 'VARCHAR(50)',
-                'country' => 'VARCHAR(50)',
-                'bonus' => 'DECIMAL(10, 2) DEFAULT 0',
-                'money_real' => 'DECIMAL(10, 2) DEFAULT 0',
-                'money_bonus' => 'DECIMAL(10, 2) DEFAULT 0'
+                User::COLUMN_EMAIL => 'VARCHAR(255)',
+                User::COLUMN_FIRSTNAME => 'VARCHAR(255)',
+                User::COLUMN_LASTNAME => 'VARCHAR(255)',
+                User::COLUMN_GENDER => 'VARCHAR(50)',
+                User::COLUMN_COUNTRY => 'VARCHAR(50)',
+                User::COLUMN_BONUS => 'DECIMAL(10, 2) DEFAULT 0',
+                User::COLUMN_MONEY_REAL => 'DECIMAL(10, 2) DEFAULT 0',
+                User::COLUMN_MONEY_BONUS => 'DECIMAL(10, 2) DEFAULT 0'
             ]
         );
 
-        $this->databaseService->addUniqueConstraint('users', 'email');
+        $this->databaseService->addUniqueConstraint(User::TABLE, User::COLUMN_EMAIL);
 
         if ($table) {
             return 'Users table created.';
@@ -62,16 +64,16 @@ class CreateTablesCommand extends Command
 
     private function createTransactionsTable(): string
     {
-        $table = $this->databaseService->createTable('transactions',
+        $table = $this->databaseService->createTable(Transaction::TABLE,
             [
-                'date' => 'DATETIME DEFAULT CURRENT_TIMESTAMP',
-                'type' => 'ENUM("deposit", "withdrawal") NOT NULL',
-                'amount' => 'DECIMAL(10, 2) NOT NULL',
-                'user_id' => 'INT'
+                Transaction::COLUMN_DATE => 'DATETIME DEFAULT CURRENT_TIMESTAMP',
+                Transaction::COLUMN_TYPE => 'ENUM("deposit", "withdrawal") NOT NULL',
+                Transaction::COLUMN_AMOUNT => 'DECIMAL(10, 2) NOT NULL',
+                Transaction::COLUMN_USER_ID => 'INT'
             ]
         );
 
-        $this->databaseService->addForeignKey('transactions', 'users', 'user_id');
+        $this->databaseService->addForeignKey(Transaction::TABLE, User::TABLE, Transaction::COLUMN_USER_ID);
 
         if ($table) {
             return 'Transactions table created.';

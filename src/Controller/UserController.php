@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Service\DatabaseService;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,20 +17,18 @@ class UserController extends AbstractController
     {
     }
 
-    #[Route(path: '/users/add', name: 'addUser', methods: 'POST')]
+    #[Route(path: '/api/v1/users/add', name: 'addUser', methods: 'POST')]
     public function add(Request $request): Response
     {
         try {
-            $user = $this->databaseService->addRowToTable('users',
+            $user = $this->databaseService->addRowToTable(User::TABLE,
                 [
-                    'email' => $request->getPayload()->get('email'),
-                    'firstName' => $request->getPayload()->get('firstName'),
-                    'lastName' => $request->getPayload()->get('lastName'),
-                    'gender' => $request->getPayload()->get('gender'),
-                    'country' => $request->getPayload()->get('country'),
-                    'money_real' => 0,
-                    'money_bonus' => 0,
-                    'bonus' => random_int(5, 20)
+                    User::COLUMN_EMAIL => $request->getPayload()->get(User::COLUMN_EMAIL),
+                    User::COLUMN_FIRSTNAME => $request->getPayload()->get(User::COLUMN_FIRSTNAME),
+                    User::COLUMN_LASTNAME => $request->getPayload()->get(User::COLUMN_LASTNAME),
+                    User::COLUMN_GENDER => $request->getPayload()->get(User::COLUMN_GENDER),
+                    User::COLUMN_COUNTRY => $request->getPayload()->get(User::COLUMN_COUNTRY),
+                    User::COLUMN_BONUS => random_int(5, 20)
                 ]
             );
         } catch (Exception $exception) {
@@ -42,21 +41,21 @@ class UserController extends AbstractController
                 'success' => $user ?? false,
                 'error' => $error ?? null
             ],
-            $errorCode ?? Response::HTTP_OK
+            $errorCode ?? Response::HTTP_CREATED
         );
     }
 
-    #[Route(path: '/users/edit/{id}', name: 'editUser', methods: 'POST')]
+    #[Route(path: '/api/v1/users/edit/{id}', name: 'editUser', methods: 'POST')]
     public function update(int $id, Request $request): Response
     {
         try {
-            $user = $this->databaseService->updateOneByID('users', $id,
+            $user = $this->databaseService->updateOneByID(User::TABLE, $id,
                 [
-                    'email' => $request->getPayload()->get('email'),
-                    'firstName' => $request->getPayload()->get('firstName'),
-                    'lastName' => $request->getPayload()->get('lastName'),
-                    'gender' => $request->getPayload()->get('gender'),
-                    'country' => $request->getPayload()->get('country')
+                    User::COLUMN_EMAIL => $request->getPayload()->get(User::COLUMN_EMAIL),
+                    User::COLUMN_FIRSTNAME => $request->getPayload()->get(User::COLUMN_FIRSTNAME),
+                    User::COLUMN_LASTNAME => $request->getPayload()->get(User::COLUMN_LASTNAME),
+                    User::COLUMN_GENDER => $request->getPayload()->get(User::COLUMN_GENDER),
+                    User::COLUMN_COUNTRY => $request->getPayload()->get(User::COLUMN_COUNTRY)
                 ]
             );
         } catch (Exception $exception) {
@@ -73,11 +72,11 @@ class UserController extends AbstractController
         );
     }
 
-    #[Route(path: '/users/{id}', name: 'showUser', methods: 'GET')]
+    #[Route(path: '/api/v1/users/{id}', name: 'showUser', methods: 'GET')]
     public function show(int $id): Response
     {
         try {
-            $user = $this->databaseService->findOneByID('users', $id);
+            $user = $this->databaseService->findOneByID(User::TABLE, $id);
         } catch (Exception $exception) {
             $error = $exception->getMessage();
             $errorCode = $exception->getCode();
