@@ -11,10 +11,10 @@ class Transaction
     const string COLUMN_AMOUNT = 'amount';
     const string COLUMN_USER_ID = 'user_id';
 
-    const array ALLOWED_COLUMNS = [
-        self::COLUMN_DATE,
-        self::COLUMN_TYPE,
-        self::COLUMN_AMOUNT,
-        self::COLUMN_USER_ID
+    const array SCHEMA = [
+        self::COLUMN_DATE => 'DATETIME DEFAULT CURRENT_TIMESTAMP',
+        self::COLUMN_TYPE => 'ENUM("deposit", "withdrawal") NOT NULL',
+        self::COLUMN_AMOUNT => 'DECIMAL(10, 2) NOT NULL',
+        self::COLUMN_USER_ID => 'INT'
     ];
 }

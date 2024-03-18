@@ -15,14 +15,14 @@ class User
     const string COLUMN_MONEY_BONUS = 'money_bonus';
     const string COLUMN_BONUS = 'bonus';
 
-    const array ALLOWED_COLUMNS = [
-        self::COLUMN_EMAIL,
-        self::COLUMN_FIRSTNAME,
-        self::COLUMN_LASTNAME,
-        self::COLUMN_GENDER,
-        self::COLUMN_COUNTRY,
-        self::COLUMN_MONEY_REAL,
-        self::COLUMN_MONEY_BONUS,
-        self::COLUMN_BONUS
+    const array SCHEMA = [
+        self::COLUMN_EMAIL => 'VARCHAR(255)',
+        self::COLUMN_FIRSTNAME => 'VARCHAR(255)',
+        self::COLUMN_LASTNAME => 'VARCHAR(255)',
+        self::COLUMN_GENDER => 'VARCHAR(50)',
+        self::COLUMN_COUNTRY => 'VARCHAR(50)',
+        self::COLUMN_BONUS => 'DECIMAL(10, 2) DEFAULT 0',
+        self::COLUMN_MONEY_REAL => 'DECIMAL(10, 2) DEFAULT 0',
+        self::COLUMN_MONEY_BONUS => 'DECIMAL(10, 2) DEFAULT 0'
     ];
 }
