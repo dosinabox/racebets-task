@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Service\DatabaseService;
+use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,9 +21,9 @@ class CreateTablesCommand extends Command
     {
         try {
             $output->writeln($this->createUsersTable());
-            $output->writeln($this->createHistoryTable());
-        } catch (\Throwable $throwable) {
-            $output->writeln('Error on creating tables: ' . $throwable->getMessage());
+            $output->writeln($this->createTransactionsTable());
+        } catch (Exception $exception) {
+            $output->writeln('Error on creating tables: ' . $exception->getMessage());
 
             return Command::FAILURE;
         }
@@ -39,14 +40,14 @@ class CreateTablesCommand extends Command
     {
         $table = $this->databaseService->createTable('users',
             [
-                'email' => 'VARCHAR(120)',
-                'firstName' => 'VARCHAR(120)',
-                'lastName' => 'VARCHAR(120)',
+                'email' => 'VARCHAR(255)',
+                'firstName' => 'VARCHAR(255)',
+                'lastName' => 'VARCHAR(255)',
                 'gender' => 'VARCHAR(50)',
                 'country' => 'VARCHAR(50)',
-                'bonus' => 'INT',
-                'money_real' => 'DECIMAL',
-                'money_bonus' => 'DECIMAL'
+                'bonus' => 'DECIMAL(10, 2) DEFAULT 0',
+                'money_real' => 'DECIMAL(10, 2) DEFAULT 0',
+                'money_bonus' => 'DECIMAL(10, 2) DEFAULT 0'
             ]
         );
 
@@ -59,21 +60,23 @@ class CreateTablesCommand extends Command
         return 'Users table not created.';
     }
 
-    private function createHistoryTable(): string
+    private function createTransactionsTable(): string
     {
-        $table = $this->databaseService->createTable('history',
+        $table = $this->databaseService->createTable('transactions',
             [
-                'date' => 'DATETIME',
-                'type' => 'VARCHAR(50)',
-                'amount' => 'DECIMAL',
+                'date' => 'DATETIME DEFAULT CURRENT_TIMESTAMP',
+                'type' => 'ENUM("deposit", "withdrawal") NOT NULL',
+                'amount' => 'DECIMAL(10, 2) NOT NULL',
                 'user_id' => 'INT'
             ]
         );
 
+        $this->databaseService->addForeignKey('transactions', 'users', 'user_id');
+
         if ($table) {
-            return 'History table created.';
+            return 'Transactions table created.';
         }
 
-        return 'History table not created.';
+        return 'Transactions table not created.';
     }
 }

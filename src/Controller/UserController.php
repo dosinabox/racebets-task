@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\DatabaseService;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,10 +32,10 @@ class UserController extends AbstractController
                     'bonus' => random_int(5, 20)
                 ]
             );
-        } catch (\Throwable $throwable) {
+        } catch (Exception $exception) {
             return new JsonResponse(
                 [
-                    'message' => 'Error on adding user: ' . $throwable->getMessage()
+                    'message' => 'Error on adding user: ' . $exception->getMessage()
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
@@ -80,10 +81,10 @@ class UserController extends AbstractController
                     'country' => $request->getPayload()->get('country')
                 ]
             );
-        } catch (\Throwable $throwable) {
+        } catch (Exception $exception) {
             return new JsonResponse(
                 [
-                    'message' => 'Error on updating user: ' . $throwable->getMessage()
+                    'message' => 'Error on updating user: ' . $exception->getMessage()
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
@@ -101,10 +102,10 @@ class UserController extends AbstractController
     {
         try {
             $user = $this->databaseService->findOneByID('users', $id);
-        } catch (\Throwable $throwable) {
+        } catch (Exception $exception) {
             return new JsonResponse(
                 [
-                    'message' => 'Error on finding user: ' . $throwable->getMessage()
+                    'message' => 'Error on finding user: ' . $exception->getMessage()
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );

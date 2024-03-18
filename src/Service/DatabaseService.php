@@ -19,14 +19,16 @@ class DatabaseService
             $_SERVER['DB_USER'],
             $_SERVER['DB_PASSWORD']
         );
+        $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->connection->exec('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
     }
 
     public function createTable(string $tableName, array $columns): bool
     {
-        $fields = 'id INT NOT NULL AUTO_INCREMENT';
+        $fields = 'id INT AUTO_INCREMENT';
 
-        foreach ($columns as $column => $type) {
-            $fields .= ',' . $column . ' ' . $type;
+        foreach ($columns as $column => $options) {
+            $fields .= ',' . $column . ' ' . $options;
         }
 
         return $this->connection
@@ -38,6 +40,13 @@ class DatabaseService
     {
         return $this->connection
             ->prepare("ALTER TABLE $tableName ADD UNIQUE ($column)")
+            ->execute();
+    }
+
+    public function addForeignKey(string $tableName, string $referenceTableName, string $foreignKey): bool
+    {
+        return $this->connection
+            ->prepare("ALTER TABLE $tableName ADD FOREIGN KEY ($foreignKey) REFERENCES $referenceTableName(id)")
             ->execute();
     }
 
