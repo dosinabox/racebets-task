@@ -82,9 +82,6 @@ class DatabaseService
 
     public function updateOneByID(string $tableName, int $id, array $data): bool
     {
-        //try to find the object first for proper exceptions and responses
-        $this->findOneByID($tableName, $id);
-
         $values_prepared = [];
 
         foreach ($data as $column => $value) {

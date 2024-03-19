@@ -21,7 +21,7 @@ class UserController extends AbstractController
     public function add(Request $request): Response
     {
         try {
-            $user = $this->databaseService->addRowToTable(User::TABLE,
+            $isAdded = $this->databaseService->addRowToTable(User::TABLE,
                 [
                     User::COLUMN_EMAIL => $request->getPayload()->get(User::COLUMN_EMAIL),
                     User::COLUMN_FIRSTNAME => $request->getPayload()->get(User::COLUMN_FIRSTNAME),
@@ -38,7 +38,7 @@ class UserController extends AbstractController
 
         return new JsonResponse(
             [
-                'success' => $user ?? false,
+                'success' => $isAdded ?? false,
                 'error' => $error ?? null
             ],
             $errorCode ?? Response::HTTP_CREATED
@@ -49,7 +49,10 @@ class UserController extends AbstractController
     public function update(int $id, Request $request): Response
     {
         try {
-            $user = $this->databaseService->updateOneByID(User::TABLE, $id,
+            //find the user first to properly handle the exception if not found
+            //TODO use $user to verify something
+            $user = $this->databaseService->findOneByID(User::TABLE, $id);
+            $isUpdated = $this->databaseService->updateOneByID(User::TABLE, $id,
                 [
                     User::COLUMN_EMAIL => $request->getPayload()->get(User::COLUMN_EMAIL),
                     User::COLUMN_FIRSTNAME => $request->getPayload()->get(User::COLUMN_FIRSTNAME),
@@ -65,7 +68,7 @@ class UserController extends AbstractController
 
         return new JsonResponse(
             [
-                'success' => $user ?? false,
+                'success' => $isUpdated ?? false,
                 'error' => $error ?? null
             ],
             $errorCode ?? Response::HTTP_OK

@@ -24,12 +24,7 @@ class TransactionController extends AbstractController
         try {
             $transactionType = $request->getPayload()->get(Transaction::COLUMN_TYPE);
             $amount = $request->getPayload()->get(Transaction::COLUMN_AMOUNT);
-
-            $transaction = match ($transactionType) {
-                TransactionService::TYPE_DEPOSIT => $this->transactionService->deposit($userID, $amount),
-                TransactionService::TYPE_WITHDRAWAL => $this->transactionService->withdraw($userID, $amount),
-                default => throw new UnknownTransactionTypeException($transactionType),
-            };
+            $transaction = $this->transactionService->addTransaction($transactionType, $userID, $amount);
         } catch (Exception $exception) {
             $error = $exception->getMessage();
             $code = $exception->getCode();
