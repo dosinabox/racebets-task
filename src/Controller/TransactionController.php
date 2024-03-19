@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Transaction;
-use App\Exception\UnknownTransactionTypeException;
 use App\Service\TransactionService;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

@@ -75,11 +75,7 @@ class DatabaseService
                 ->prepare("INSERT INTO $tableName ($columns) VALUES ($values)")
                 ->execute();
         } catch (Exception $exception) {
-            if ($exception->getCode() === '23000') {
-                throw new DuplicateEntryException($tableName);
-            }
-
-            throw $exception;
+            throw $this->checkForDuplicateEntry($exception, $tableName);
         }
 
         return $isAdded;
@@ -122,11 +118,7 @@ class DatabaseService
                 ->prepare("UPDATE $tableName SET $values WHERE id = $id")
                 ->execute();
         } catch (Exception $exception) {
-            if ($exception->getCode() === '23000') {
-                throw new DuplicateEntryException($tableName);
-            }
-
-            throw $exception;
+            throw $this->checkForDuplicateEntry($exception, $tableName);
         }
 
         return $isUpdated;
@@ -135,5 +127,11 @@ class DatabaseService
     public function getConnection(): PDO
     {
         return $this->connection;
+    }
+
+    //just because 23000 is not a valid HTTP response code
+    private function checkForDuplicateEntry(Exception $exception, string $tableName): Exception
+    {
+        return $exception->getCode() === '23000' ? new DuplicateEntryException($tableName) : $exception;
     }
 }
