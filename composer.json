@@ -11,6 +11,7 @@
         "ext-iconv": "*",
         "ext-pdo": "*",
         "runtime/frankenphp-symfony": "^0.2.0",
+        "sentry/sentry-symfony": "^4.14",
         "symfony/console": "7.0.*",
         "symfony/dotenv": "7.0.*",
         "symfony/flex": "^2",

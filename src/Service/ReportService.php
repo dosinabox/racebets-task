@@ -24,6 +24,7 @@ class ReportService
 
     private function getTransactionsReport(?string $dateStart, ?string $dateEnd): false|array
     {
+        //TODO add unique customers column and use start/end date
         return $this->databaseService->leftJoin(
             Transaction::TABLE,
             User::TABLE,
