@@ -15,6 +15,7 @@ Use Postman to access the following endpoints:
 - `https://localhost/api/v1/users/edit/{id}` (POST): Send form-data to update an existing user.
 - `https://localhost/api/v1/users/{id}` (GET): Get info about an existing user.
 - `https://localhost/api/v1/transactions/{id}` (POST): Send form-data to create a transaction for the user with the given ID.
+- `https://localhost/api/v1/reports` (POST): Send form-data to get the report about the latest transactions (past 7 days by default).
 
 POST form-data example for users:
 ```
@@ -31,5 +32,13 @@ POST form-data example for transactions:
 {
     'type': 'deposit',  //'deposit' or 'withdrawal' only
     'amount': 100       //float values also accepted
+}
+```
+POST form-data example for report:
+```
+{
+    'type': 'transactions',
+    'date_start': '2024-03-18',
+    'date_end': '2024-03-19'
 }
 ```

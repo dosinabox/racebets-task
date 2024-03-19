@@ -81,10 +81,11 @@ class DatabaseService
         return $isAdded;
     }
 
-    public function findOneByID(string $tableName, int $id): false|array
+    public function findOneByID(string $tableName, int $id, array $columns = ['*']): false|array
     {
+        $select = implode(',', $columns);
         $object = $this->connection
-            ->query("SELECT * FROM $tableName WHERE id = $id LIMIT 1")
+            ->query("SELECT $select FROM $tableName WHERE id = $id LIMIT 1")
             ->fetch(PDO::FETCH_ASSOC);
 
         if (!$object) {
@@ -92,6 +93,25 @@ class DatabaseService
         }
 
         return $object;
+    }
+
+    public function leftJoin(
+        string $table1,
+        string $table2,
+        array $link,
+        array $columns = ['*'],
+        array $conditions = [],
+        array $groupBy = []
+    ): false|array
+    {
+        $select = implode(',', $columns);
+        $on = sprintf('%s = %s', array_key_first($link), array_values($link)[0]);
+        $where = implode(',', $conditions);
+        $group = implode(',', $groupBy);
+
+        return $this->connection
+            ->query("SELECT $select FROM $table1 LEFT JOIN $table2 ON ($on) WHERE $where GROUP BY $group")
+            ->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
