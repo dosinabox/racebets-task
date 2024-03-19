@@ -56,6 +56,13 @@ class TransactionService
         }
     }
 
+    /**
+     * @param array $user
+     * @param int $userID
+     * @param float $amount
+     * @return bool
+     * @throws Exception
+     */
     private function deposit(array $user, int $userID, float $amount): bool
     {
         $availableBalance = (float)$user[User::COLUMN_MONEY_REAL];
@@ -76,6 +83,13 @@ class TransactionService
         );
     }
 
+    /**
+     * @param array $user
+     * @param int $userID
+     * @param float $amount
+     * @return bool
+     * @throws Exception
+     */
     private function withdraw(array $user, int $userID, float $amount): bool
     {
         $availableBalance = (float)$user[User::COLUMN_MONEY_REAL];

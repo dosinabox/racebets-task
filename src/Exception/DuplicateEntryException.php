@@ -5,12 +5,12 @@ namespace App\Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-final class InsufficientBalanceException extends BadRequestHttpException
+final class DuplicateEntryException extends BadRequestHttpException
 {
-    public function __construct(string $userID)
+    public function __construct(string $tableName)
     {
         parent::__construct(
-            message: sprintf('Insufficient balance to complete this operation for user %s.', $userID),
+            message: sprintf('Unable to add an entry to %s table: duplicate entry detected.', $tableName),
             code: Response::HTTP_BAD_REQUEST
         );
     }

@@ -2,7 +2,9 @@
 
 namespace App\Service;
 
+use App\Exception\DuplicateEntryException;
 use App\Exception\NotFoundException;
+use Exception;
 use PDO;
 
 class DatabaseService
@@ -51,6 +53,12 @@ class DatabaseService
             ->execute();
     }
 
+    /**
+     * @param string $tableName
+     * @param array $data
+     * @return bool
+     * @throws Exception
+     */
     public function addRowToTable(string $tableName, array $data): bool
     {
         $values_prepared = [];
@@ -62,9 +70,19 @@ class DatabaseService
         $values = implode(',', array_values($values_prepared));
         $columns = implode(',', array_keys($data));
 
-        return $this->connection
-            ->prepare("INSERT INTO $tableName ($columns) VALUES ($values)")
-            ->execute();
+        try {
+            $isAdded = $this->connection
+                ->prepare("INSERT INTO $tableName ($columns) VALUES ($values)")
+                ->execute();
+        } catch (Exception $exception) {
+            if ($exception->getCode() === '23000') {
+                throw new DuplicateEntryException($tableName);
+            }
+
+            throw $exception;
+        }
+
+        return $isAdded;
     }
 
     public function findOneByID(string $tableName, int $id): false|array
@@ -80,6 +98,13 @@ class DatabaseService
         return $object;
     }
 
+    /**
+     * @param string $tableName
+     * @param int $id
+     * @param array $data
+     * @return bool
+     * @throws Exception
+     */
     public function updateOneByID(string $tableName, int $id, array $data): bool
     {
         $values_prepared = [];
@@ -92,9 +117,19 @@ class DatabaseService
 
         $values = implode(',', $values_prepared);
 
-        return $this->connection
-            ->prepare("UPDATE $tableName SET $values WHERE id = $id")
-            ->execute();
+        try {
+            $isUpdated = $this->connection
+                ->prepare("UPDATE $tableName SET $values WHERE id = $id")
+                ->execute();
+        } catch (Exception $exception) {
+            if ($exception->getCode() === '23000') {
+                throw new DuplicateEntryException($tableName);
+            }
+
+            throw $exception;
+        }
+
+        return $isUpdated;
     }
 
     public function getConnection(): PDO
