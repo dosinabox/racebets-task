@@ -149,6 +149,13 @@ class DatabaseService
         return $this->connection;
     }
 
+    public function dropTable(string $tableName): bool
+    {
+        return $this->connection
+            ->prepare("DROP TABLE IF EXISTS $tableName")
+            ->execute();
+    }
+
     //just because 23000 is not a valid HTTP response code
     private function checkForDuplicateEntry(Exception $exception, string $tableName): Exception
     {
