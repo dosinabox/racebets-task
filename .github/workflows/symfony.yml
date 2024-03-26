@@ -42,4 +42,6 @@ jobs:
           mkdir -p data
           touch data/database.mysql
       - name: Execute tests (Unit and Feature tests) via PHPUnit
+        env:
+            DB_HOST: mysql:///%kernel.project_dir%/data/database.mysql
         run: vendor/bin/phpunit
