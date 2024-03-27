@@ -106,7 +106,7 @@ class DatabaseService
     {
         $select = implode(',', $columns);
         $on = sprintf('%s = %s', array_key_first($link), array_values($link)[0]);
-        $where = implode(',', $conditions);
+        $where = implode(' AND ', $conditions);
         $group = implode(',', $groupBy);
 
         return $this->connection
