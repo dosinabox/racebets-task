@@ -5,6 +5,8 @@ namespace App\Service;
 use App\Entity\Transaction;
 use App\Entity\User;
 use App\Exception\UnknownReportTypeException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ReportService
 {
@@ -24,7 +26,18 @@ class ReportService
 
     private function getTransactionsReport(?string $dateStart, ?string $dateEnd): false|array
     {
-        //TODO add unique customers column and use start/end date
+        if ($dateStart > $dateEnd) {
+            throw new BadRequestHttpException('Start date cannot be higher that end date!',
+                code: Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        if (is_null($dateStart) || is_null($dateEnd)) {
+            $dateStart = 'CURDATE() - INTERVAL 7 DAY';
+            $dateEnd = 'CURDATE()';
+        }
+
+        //TODO add unique customers column
         return $this->databaseService->leftJoin(
             Transaction::TABLE,
             User::TABLE,
@@ -60,9 +73,11 @@ class ReportService
                 )
             ],
             [
-                sprintf('%s.%s >= CURDATE() - INTERVAL 7 DAY',
+                sprintf('DATE(%s.%s) BETWEEN "%s" AND "%s"',
                     Transaction::TABLE,
-                    Transaction::COLUMN_DATE
+                    Transaction::COLUMN_DATE,
+                    $dateStart,
+                    $dateEnd
                 )
             ],
             [

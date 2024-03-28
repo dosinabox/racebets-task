@@ -106,7 +106,7 @@ class DatabaseService
     {
         $select = implode(',', $columns);
         $on = sprintf('%s = %s', array_key_first($link), array_values($link)[0]);
-        $where = implode(',', $conditions);
+        $where = implode(' AND ', $conditions);
         $group = implode(',', $groupBy);
 
         return $this->connection
@@ -147,6 +147,13 @@ class DatabaseService
     public function getConnection(): PDO
     {
         return $this->connection;
+    }
+
+    public function dropTable(string $tableName): bool
+    {
+        return $this->connection
+            ->prepare("DROP TABLE IF EXISTS $tableName")
+            ->execute();
     }
 
     //just because 23000 is not a valid HTTP response code
